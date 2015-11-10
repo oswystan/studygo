@@ -16,7 +16,7 @@
 package main
 
 import (
-	"wsh/commands"
+	"study/wsh/commands"
 )
 
 func main() {
