@@ -1,11 +1,15 @@
 #!/bin/bash
 while [ 1 ]
 do
-    echo ">>================"
-    nc localhost 8000 <<EOF
+    nc localhost 8000 >/dev/null 2>&1<<EOF
 wangyu
 shenghuo
+bye
 EOF
-    echo "<<================"
+    if [ $? -ne 0 ]; then
+        echo `date +'%Y-%m-%d %T'` "server down!!"
+    else
+        echo `date +'%Y-%m-%d %T'` "server up"
+    fi
     sleep 1
 done
