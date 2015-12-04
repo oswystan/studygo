@@ -12,7 +12,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"net"
 	"strings"
@@ -33,7 +32,7 @@ func handleConn(c net.Conn) error {
 		if content == "bye" || content == "quit" {
 			break
 		}
-		fmt.Printf("(%s)=><%s>\n", c.RemoteAddr(), content)
+		log.Printf("(%s)=>%s\n", c.RemoteAddr(), content)
 		str = "hello " + str
 		w.WriteString(str)
 		w.Flush()

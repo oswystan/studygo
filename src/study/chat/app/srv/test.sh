@@ -2,8 +2,7 @@
 while [ 1 ]
 do
     nc localhost 8000 >/dev/null 2>&1<<EOF
-wangyu
-shenghuo
+test.sh run
 bye
 EOF
     if [ $? -ne 0 ]; then
