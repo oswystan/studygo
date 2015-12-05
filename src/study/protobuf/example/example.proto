@@ -1,0 +1,6 @@
+package example;
+
+message Test {
+    required string Label=1;
+    required int32 Number=2;
+}
