@@ -13,17 +13,17 @@ package imc_lib
 import (
 	"bufio"
 	"log"
-	"strings"
+
+	"github.com/golang/protobuf/proto"
 )
 
 type userConn struct {
 }
 
 func (u *userConn) HandleMessage(data []byte, w *bufio.Writer) error {
-	str := strings.TrimSuffix(string(data), "\n")
-	log.Printf("%s\n", str)
-	w.WriteString("<<<" + str + "\n")
-	w.Flush()
+	msg := &ImcCmd{}
+	proto.Unmarshal(data, msg)
+	log.Println(msg)
 	return nil
 }
 
