@@ -18,8 +18,17 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+const (
+	STATE_UNAUTHORIZED = iota
+	STATE_AUTHORIZED
+	STATE_MAX
+)
+
+type dispatcherType map[CMD_TYPE]func(msg *ImcCmd) (data []byte)
+
 type userConn struct {
-	dispatcher map[CMD_TYPE]func(msg *ImcCmd) (data []byte)
+	dispatcher [STATE_MAX]dispatcherType
+	state      int
 }
 
 func (u *userConn) doLogin(msg *ImcCmd) (data []byte) {
@@ -35,6 +44,10 @@ func (u *userConn) doLogin(msg *ImcCmd) (data []byte) {
 		},
 	}
 	data, _ = proto.Marshal(ack)
+
+	// chage to state so the client can do
+	// anything they want
+	u.state = STATE_AUTHORIZED
 	return data
 }
 
@@ -60,7 +73,8 @@ func (u *userConn) doModifyInfo(msg *ImcCmd) (data []byte) {
 
 func (u *userConn) dispatchMsg(msg *ImcCmd) (data []byte) {
 
-	if fn, ok := u.dispatcher[*msg.CmdType]; ok {
+	dispatcher := u.dispatcher[u.state]
+	if fn, ok := dispatcher[*msg.CmdType]; ok {
 		return fn(msg)
 	} else {
 		cmd := CMD_TYPE_MODIFYINFO_ACK
@@ -69,7 +83,7 @@ func (u *userConn) dispatchMsg(msg *ImcCmd) (data []byte) {
 			CmdType: &cmd,
 			AckCommon: &CmdAckCommon{
 				Status:    &status,
-				ErrorDesc: proto.String(fmt.Sprintf("unknow command type <%s>", msg.CmdType.String())),
+				ErrorDesc: proto.String(fmt.Sprintf("unauthorized command type <%s>", msg.CmdType.String())),
 			},
 		}
 		data, _ = proto.Marshal(ack)
@@ -90,9 +104,18 @@ func (u *userConn) HandleMessage(data []byte, w *bufio.Writer) error {
 
 // init the dispatcher of current userConn
 func (u *userConn) Init() {
-	u.dispatcher = make(map[CMD_TYPE]func(msg *ImcCmd) []byte)
-	u.dispatcher[CMD_TYPE_LOGIN] = u.doLogin
-	u.dispatcher[CMD_TYPE_MODIFYINFO] = u.doModifyInfo
+	u.state = STATE_UNAUTHORIZED
+
+	for i := 0; i < STATE_MAX; i++ {
+		u.dispatcher[i] = make(dispatcherType)
+	}
+
+	unauthorized := u.dispatcher[STATE_UNAUTHORIZED]
+	unauthorized[CMD_TYPE_LOGIN] = u.doLogin
+
+	authorized := u.dispatcher[STATE_AUTHORIZED]
+	authorized[CMD_TYPE_LOGIN] = u.doLogin
+	authorized[CMD_TYPE_MODIFYINFO] = u.doModifyInfo
 }
 
 func newUserConn() *userConn {

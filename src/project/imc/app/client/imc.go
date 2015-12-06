@@ -29,8 +29,17 @@ func main() {
 	reader := bufio.NewReader(conn)
 	proxy := imc.NewImcProxy(reader, writer)
 
-	proxy.DoLogin("wangyu", "1234")
-	proxy.DoModifyInfo("wangyu", "nopasswd", "oswystan")
+	// login first
+	if err = proxy.DoLogin("wangyu", "1234"); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("login success")
+
+	if err = proxy.DoModifyInfo("wangyu", "nopasswd", "oswystan"); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("modify info success")
+	log.Println("exit!!")
 }
 
 //==================================== END ======================================
