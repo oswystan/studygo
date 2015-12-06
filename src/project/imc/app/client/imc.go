@@ -15,7 +15,6 @@ import (
 	"log"
 	"net"
 	imc "project/imc/imc_lib"
-	"time"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -40,8 +39,16 @@ func doLogin(writer *bufio.Writer, name, pwd string) error {
 	return nil
 }
 
+func waitForResponse(reader *bufio.Reader) *imc.ImcCmd {
+	data := make([]byte, 1024)
+	reader.Read(data)
+	cmd := &imc.ImcCmd{}
+	proto.Unmarshal(data, cmd)
+	return cmd
+}
+
 func doModifyInfo(writer *bufio.Writer, name, pwd, nick string) error {
-	cmd := imc.CMD_TYPE_MODIFYINFO + 10
+	cmd := imc.CMD_TYPE_MODIFYINFO
 	modify := &imc.ImcCmd{
 		CmdType: &cmd,
 		ModifyInfo: &imc.CmdModifyInfo{
@@ -58,6 +65,7 @@ func doModifyInfo(writer *bufio.Writer, name, pwd, nick string) error {
 	}
 	writer.Write(data)
 	writer.Flush()
+
 	return nil
 }
 
@@ -70,10 +78,18 @@ func main() {
 	defer conn.Close()
 
 	writer := bufio.NewWriter(conn)
+	reader := bufio.NewReader(conn)
 	doLogin(writer, "wangyu", "12")
-	time.Sleep(10 * time.Millisecond)
+	ack := waitForResponse(reader)
+	if *ack.AckCommon.Status != imc.RET_CODE_SUCCESS {
+		log.Println("fail to do login", *ack.AckCommon.ErrorDesc)
+	}
+
 	doModifyInfo(writer, "wangyu", "111", "wystan")
-	time.Sleep(10 * time.Millisecond)
+	ack = waitForResponse(reader)
+	if *ack.AckCommon.Status != imc.RET_CODE_SUCCESS {
+		log.Println("fail to do modifyinfo", *ack.AckCommon.ErrorDesc)
+	}
 }
 
 //==================================== END ======================================

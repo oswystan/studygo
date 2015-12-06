@@ -1,13 +1,30 @@
+//=========================================================
+//
+// all messages used by the current chat server and client
+//
+//=========================================================
 package imc_lib;
 
 enum CMD_TYPE {
     LOGIN = 1;
     MODIFYINFO = 2;
+
+    LOGIN_ACK = 100;
+    MODIFYINFO_ACK = 101;
+}
+
+enum RET_CODE {
+    SUCCESS = 1;
+    FAILED = 2;
 }
 
 message CmdLogin {
     required string UserName=1;
     required string Passwd=2;
+}
+message CmdAckCommon {
+    required RET_CODE Status=1;
+    optional string  ErrorDesc=2;
 }
 
 message CmdModifyInfo {
@@ -17,8 +34,9 @@ message CmdModifyInfo {
 }
 
 message ImcCmd {
-    required CMD_TYPE      CmdType=1;
-    optional CmdLogin      Login=2;
-    optional CmdModifyInfo ModifyInfo=3;
+    required CMD_TYPE         CmdType=1;
+    optional CmdLogin         Login=2;
+    optional CmdModifyInfo    ModifyInfo=3;
+    optional CmdAckCommon     AckCommon=4;
 }
 
