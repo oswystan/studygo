@@ -21,8 +21,9 @@ import (
 )
 
 func doLogin(writer *bufio.Writer, name, pwd string) error {
+	cmd := imc.CMD_TYPE_LOGIN
 	login := &imc.ImcCmd{
-		CmdType: proto.Int32(1),
+		CmdType: &cmd,
 		Login: &imc.CmdLogin{
 			UserName: proto.String(name),
 			Passwd:   proto.String(pwd),
@@ -40,8 +41,9 @@ func doLogin(writer *bufio.Writer, name, pwd string) error {
 }
 
 func doModifyInfo(writer *bufio.Writer, name, pwd, nick string) error {
+	cmd := imc.CMD_TYPE_MODIFYINFO + 10
 	modify := &imc.ImcCmd{
-		CmdType: proto.Int32(2),
+		CmdType: &cmd,
 		ModifyInfo: &imc.CmdModifyInfo{
 			UserName:  proto.String(name),
 			NewPasswd: proto.String(pwd),

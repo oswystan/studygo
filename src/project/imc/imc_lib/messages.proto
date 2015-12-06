@@ -1,5 +1,10 @@
 package imc_lib;
 
+enum CMD_TYPE {
+    LOGIN = 1;
+    MODIFYINFO = 2;
+}
+
 message CmdLogin {
     required string UserName=1;
     required string Passwd=2;
@@ -12,7 +17,7 @@ message CmdModifyInfo {
 }
 
 message ImcCmd {
-    required int32         CmdType=1;
+    required CMD_TYPE      CmdType=1;
     optional CmdLogin      Login=2;
     optional CmdModifyInfo ModifyInfo=3;
 }

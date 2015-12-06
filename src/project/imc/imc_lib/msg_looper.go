@@ -39,7 +39,7 @@ func (l *msgLooper) Loop(c net.Conn) {
 			break
 		}
 		if err = l.handler.HandleMessage(data[0:count], writer); err != nil {
-			break
+			log.Println(err)
 		}
 	}
 }
