@@ -1,16 +1,19 @@
-package example;
+package imc_lib;
 
 message CmdLogin {
     required string UserName=1;
     required string Passwd=2;
 }
+
 message CmdModifyInfo {
     required string UserName=1;
-    required string NewPwd=2;
+    required string NewPasswd=2;
     required string NickName=3;
 }
-message Test {
-    required int32 CmdType=1;
-    optional CmdLogin Login=2;
+
+message ImcCmd {
+    required int32         CmdType=1;
+    optional CmdLogin      Login=2;
     optional CmdModifyInfo ModifyInfo=3;
 }
+

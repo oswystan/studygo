@@ -17,26 +17,48 @@ import (
 )
 
 func main() {
-	test := &example.Test{
-		Label:  proto.String("f"),
-		Number: proto.Int32(20),
+
+	modify := &example.Test{
+		CmdType: proto.Int32(1),
+		ModifyInfo: &example.CmdModifyInfo{
+			UserName: proto.String("wangyu"),
+			NewPwd:   proto.String("1234"),
+			NickName: proto.String("wystan"),
+		},
 	}
 
-	data, err := proto.Marshal(test)
+	login := &example.Test{
+		CmdType: proto.Int32(1),
+		Login: &example.CmdLogin{
+			UserName: proto.String("wangyu"),
+			Passwd:   proto.String("1232323"),
+		},
+	}
+	dataModify, err := proto.Marshal(modify)
+	if err != nil {
+		fmt.Printf("err\n")
+		return
+	}
+	dataLogin, err := proto.Marshal(login)
 	if err != nil {
 		fmt.Printf("err\n")
 		return
 	}
 
 	newTest := &example.Test{}
-	err = proto.Unmarshal(data, newTest)
+	err = proto.Unmarshal(dataModify, newTest)
 	if err != nil {
-		fmt.Printf("err 2\n")
+		fmt.Printf("err modify\n")
 		return
 	}
-
 	fmt.Printf("msg=%v\n", newTest)
-	fmt.Printf("len=%d\n", len(data))
+
+	err = proto.Unmarshal(dataLogin, newTest)
+	if err != nil {
+		fmt.Printf("err login\n")
+		return
+	}
+	fmt.Printf("msg=%v\n", newTest)
 }
 
 //==================================== END ======================================

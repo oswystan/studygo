@@ -34,7 +34,10 @@ func (s *ImcServer) Run() error {
 			return err
 		}
 		log.Println("new client arrived")
-		con.Close()
+
+		uc := newUserConn()
+		looper := newMsgLooper(uc)
+		go looper.Loop(con)
 	}
 
 	return nil
