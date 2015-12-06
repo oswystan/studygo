@@ -39,6 +39,12 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("modify info success")
+
+	if err = proxy.DoLogout("wangyu"); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("logout success")
+
 	log.Println("exit!!")
 }
 

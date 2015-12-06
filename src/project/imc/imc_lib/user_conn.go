@@ -70,7 +70,23 @@ func (u *userConn) doModifyInfo(msg *ImcCmd) (data []byte) {
 	data, _ = proto.Marshal(ack)
 	return data
 }
+func (u *userConn) doLogout(msg *ImcCmd) (data []byte) {
 
+	log.Printf("LOGOUT (user:%s)", *msg.Logout.UserName)
+
+	cmd := CMD_TYPE_LOGOUT_ACK
+	status := RET_CODE_SUCCESS
+	ack := &ImcCmd{
+		CmdType: &cmd,
+		AckCommon: &CmdAckCommon{
+			Status:    &status,
+			ErrorDesc: proto.String(""),
+		},
+	}
+	data, _ = proto.Marshal(ack)
+	u.state = STATE_UNAUTHORIZED
+	return data
+}
 func (u *userConn) dispatchMsg(msg *ImcCmd) (data []byte) {
 
 	dispatcher := u.dispatcher[u.state]
@@ -116,6 +132,7 @@ func (u *userConn) Init() {
 	authorized := u.dispatcher[STATE_AUTHORIZED]
 	authorized[CMD_TYPE_LOGIN] = u.doLogin
 	authorized[CMD_TYPE_MODIFYINFO] = u.doModifyInfo
+	authorized[CMD_TYPE_LOGOUT] = u.doLogout
 }
 
 func newUserConn() *userConn {

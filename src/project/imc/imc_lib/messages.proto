@@ -8,9 +8,11 @@ package imc_lib;
 enum CMD_TYPE {
     LOGIN = 1;
     MODIFYINFO = 2;
+    LOGOUT = 3;
 
     LOGIN_ACK = 100;
     MODIFYINFO_ACK = 101;
+    LOGOUT_ACK = 102;
 }
 
 enum RET_CODE {
@@ -33,10 +35,15 @@ message CmdModifyInfo {
     required string NickName=3;
 }
 
+message CmdLogout {
+    required string UserName=1;
+}
+
 message ImcCmd {
     required CMD_TYPE         CmdType=1;
     optional CmdLogin         Login=2;
     optional CmdModifyInfo    ModifyInfo=3;
     optional CmdAckCommon     AckCommon=4;
+    optional CmdLogout        Logout=5;
 }
 

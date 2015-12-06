@@ -25,7 +25,7 @@ type ImcProxy struct {
 
 func (p *ImcProxy) DoLogin(name, pwd string) error {
 	cmd := CMD_TYPE_LOGIN
-	login := &ImcCmd{
+	c := &ImcCmd{
 		CmdType: &cmd,
 		Login: &CmdLogin{
 			UserName: proto.String(name),
@@ -33,7 +33,7 @@ func (p *ImcProxy) DoLogin(name, pwd string) error {
 		},
 	}
 
-	data, err := proto.Marshal(login)
+	data, err := proto.Marshal(c)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -50,7 +50,7 @@ func (p *ImcProxy) DoLogin(name, pwd string) error {
 
 func (p *ImcProxy) DoModifyInfo(name, pwd, nick string) error {
 	cmd := CMD_TYPE_MODIFYINFO
-	modify := &ImcCmd{
+	c := &ImcCmd{
 		CmdType: &cmd,
 		ModifyInfo: &CmdModifyInfo{
 			UserName:  proto.String(name),
@@ -59,7 +59,30 @@ func (p *ImcProxy) DoModifyInfo(name, pwd, nick string) error {
 		},
 	}
 
-	data, err := proto.Marshal(modify)
+	data, err := proto.Marshal(c)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	p.writer.Write(data)
+	p.writer.Flush()
+
+	ack := p.waitForResponse(p.reader)
+	if *ack.AckCommon.Status != RET_CODE_SUCCESS {
+		return fmt.Errorf("%s", *ack.AckCommon.ErrorDesc)
+	}
+	return nil
+}
+func (p *ImcProxy) DoLogout(name string) error {
+	cmd := CMD_TYPE_LOGOUT
+	c := &ImcCmd{
+		CmdType: &cmd,
+		Logout: &CmdLogout{
+			UserName: proto.String(name),
+		},
+	}
+
+	data, err := proto.Marshal(c)
 	if err != nil {
 		log.Println(err)
 		return err
