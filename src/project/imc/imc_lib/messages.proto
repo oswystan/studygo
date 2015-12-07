@@ -9,10 +9,12 @@ enum CMD_TYPE {
     LOGIN = 1;
     MODIFYINFO = 2;
     LOGOUT = 3;
+    SENDMSG = 4;
 
     LOGIN_ACK = 100;
     MODIFYINFO_ACK = 101;
     LOGOUT_ACK = 102;
+    SENDMSG_ACK = 103;
 }
 
 enum RET_CODE {
@@ -39,11 +41,17 @@ message CmdLogout {
     required string UserName=1;
 }
 
+message CmdSendMsg {
+    required string PeerName=1;
+    required string MsgBody=2;
+}
+
 message ImcCmd {
     required CMD_TYPE         CmdType=1;
     optional CmdLogin         Login=2;
     optional CmdModifyInfo    ModifyInfo=3;
     optional CmdAckCommon     AckCommon=4;
     optional CmdLogout        Logout=5;
+    optional CmdSendMsg       SendMsg=6;
 }
 

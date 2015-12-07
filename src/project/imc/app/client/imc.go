@@ -40,6 +40,11 @@ func main() {
 	}
 	log.Println("modify info success")
 
+	if err = proxy.DoSendMsg("momo", "hello, momo, how are you doing ?"); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("send msg success")
+
 	if err = proxy.DoLogout("wangyu"); err != nil {
 		log.Fatal(err)
 	}

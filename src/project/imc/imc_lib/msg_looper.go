@@ -19,7 +19,8 @@ import (
 
 type msgHandler interface {
 	/* methods */
-	HandleMessage(data []byte, w *bufio.Writer) error
+	HandleMessage(data []byte) error
+	Exit()
 }
 
 type msgLooper struct {
@@ -30,7 +31,6 @@ func (l *msgLooper) Loop(c net.Conn) {
 	defer c.Close()
 
 	reader := bufio.NewReader(c)
-	writer := bufio.NewWriter(c)
 	data := make([]byte, 1024)
 	for {
 		count, err := reader.Read(data)
@@ -38,10 +38,11 @@ func (l *msgLooper) Loop(c net.Conn) {
 			log.Printf("client exit!")
 			break
 		}
-		if err = l.handler.HandleMessage(data[0:count], writer); err != nil {
+		if err = l.handler.HandleMessage(data[0:count]); err != nil {
 			log.Println(err)
 		}
 	}
+	l.handler.Exit()
 }
 
 func newMsgLooper(h msgHandler) *msgLooper {
