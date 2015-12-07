@@ -12,7 +12,6 @@ package imc_lib
 
 import (
 	"bufio"
-	"io"
 	"log"
 	"net"
 )
@@ -31,14 +30,13 @@ func (l *msgLooper) Loop(c net.Conn) {
 	defer c.Close()
 
 	reader := bufio.NewReader(c)
-	data := make([]byte, 1024)
 	for {
-		count, err := reader.Read(data)
-		if err == io.EOF {
-			log.Printf("client exit!")
+		data, err := readMsgData(reader)
+		if err != nil {
+			log.Printf("client exit! %v", err)
 			break
 		}
-		if err = l.handler.HandleMessage(data[0:count]); err != nil {
+		if err = l.handler.HandleMessage(data); err != nil {
 			log.Println(err)
 		}
 	}

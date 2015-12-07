@@ -155,8 +155,8 @@ func (u *userConn) HandleMessage(data []byte) error {
 	msg := &ImcCmd{}
 	proto.Unmarshal(data, msg)
 	ack := u.dispatchMsg(msg)
-	u.writer.Write(ack)
-	u.writer.Flush()
+
+	writeMsgData(u.writer, ack)
 	return nil
 }
 

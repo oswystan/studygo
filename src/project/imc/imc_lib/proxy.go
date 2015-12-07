@@ -73,9 +73,14 @@ func (p *ImcProxy) DoSendMsg(peer, msg string) error {
 	return p.sendAndWait(c)
 }
 func (p *ImcProxy) waitForResponse(reader *bufio.Reader) *ImcCmd {
-	data := make([]byte, 1024)
-	p.reader.Read(data)
 	cmd := &ImcCmd{}
+
+	data, err := readMsgData(reader)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+
 	proto.Unmarshal(data, cmd)
 	return cmd
 }
@@ -86,8 +91,8 @@ func (p *ImcProxy) sendAndWait(c *ImcCmd) error {
 		log.Println(err)
 		return err
 	}
-	p.writer.Write(data)
-	p.writer.Flush()
+
+	writeMsgData(p.writer, data)
 
 	ack := p.waitForResponse(p.reader)
 	if *ack.AckCommon.Status != RET_CODE_SUCCESS {
