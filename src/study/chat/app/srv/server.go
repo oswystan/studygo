@@ -40,6 +40,12 @@ func handleConn(c net.Conn) error {
 	return nil
 }
 
+var c uint32 = 2000
+
+func fun() error {
+	return c
+}
+
 func main() {
 	log.Printf("server started...\n")
 	ln, err := net.Listen("tcp", "localhost:8000")
