@@ -11,10 +11,10 @@ enum CMD_TYPE {
     LOGOUT = 3;
     SENDMSG = 4;
 
-    LOGIN_ACK = 100;
-    MODIFYINFO_ACK = 101;
-    LOGOUT_ACK = 102;
-    SENDMSG_ACK = 103;
+    LOGIN_ACK = 101;
+    MODIFYINFO_ACK = 102;
+    LOGOUT_ACK = 103;
+    SENDMSG_ACK = 104;
 }
 
 enum RET_CODE {

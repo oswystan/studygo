@@ -14,6 +14,7 @@ import (
 	"bufio"
 	"log"
 	"net"
+	"sync"
 )
 
 type msgHandler interface {
@@ -23,13 +24,18 @@ type msgHandler interface {
 }
 
 type msgLooper struct {
+	running int
 	handler msgHandler
+	conn    net.Conn
+	wg      sync.WaitGroup
 }
 
-func (l *msgLooper) Loop(c net.Conn) {
-	defer c.Close()
+func (l *msgLooper) Loop() {
+	l.wg.Add(1)
+	l.running = 1
+	defer l.conn.Close()
 
-	reader := bufio.NewReader(c)
+	reader := bufio.NewReader(l.conn)
 	for {
 		data, err := readMsgData(reader)
 		if err != nil {
@@ -41,10 +47,20 @@ func (l *msgLooper) Loop(c net.Conn) {
 		}
 	}
 	l.handler.Exit()
+	l.running = 0
+	l.wg.Done()
 }
 
-func newMsgLooper(h msgHandler) *msgLooper {
-	return &msgLooper{handler: h}
+func (l *msgLooper) Exit() {
+	l.conn.Close()
+	l.handler.Exit()
+	if l.running == 1 {
+		l.wg.Wait()
+	}
+}
+
+func newMsgLooper(h msgHandler, c net.Conn) *msgLooper {
+	return &msgLooper{handler: h, conn: c}
 }
 
 //==================================== END ======================================

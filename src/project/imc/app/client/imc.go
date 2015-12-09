@@ -11,7 +11,6 @@
 package main
 
 import (
-	"bufio"
 	"log"
 	"net"
 	imc "project/imc/imc_lib"
@@ -25,9 +24,8 @@ func main() {
 	}
 	defer conn.Close()
 
-	writer := bufio.NewWriter(conn)
-	reader := bufio.NewReader(conn)
-	proxy := imc.NewImcProxy(reader, writer)
+	proxy := imc.NewImcProxy(conn)
+	proxy.Start()
 
 	// login first
 	if err = proxy.DoLogin("wangyu", "1234"); err != nil {
@@ -50,6 +48,7 @@ func main() {
 	}
 	log.Println("logout success")
 
+	proxy.Stop()
 	log.Println("exit!!")
 }
 
