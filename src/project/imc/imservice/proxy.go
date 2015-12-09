@@ -39,6 +39,7 @@ type ImcProxy struct {
 	ack     *ackReceiver
 	notify  *notifyReceiver
 	unknown *unauthorizedReceiver
+	client  MessageReceiver
 
 	remotech chan *ImcCmd
 }
@@ -73,13 +74,13 @@ func (r *ackReceiver) Receive(msg *ImcCmd) int {
 	return MSG_STOP
 }
 func (r *notifyReceiver) Receive(msg *ImcCmd) int {
-	if r.client != nil {
-		return r.client.Receive(msg)
+	if *msg.CmdType != CMD_TYPE_MESSAGE || r.client == nil {
+		return MSG_CONTINUE
 	}
-	return MSG_CONTINUE
+	return r.client.Receive(msg)
 }
 func (r *unauthorizedReceiver) Receive(msg *ImcCmd) int {
-	log.Printf("unauthorized msg : %#v", msg)
+	log.Printf("unauthorized msg : %v", msg)
 	return MSG_STOP
 }
 
@@ -209,7 +210,7 @@ func (p *ImcProxy) Start() error {
 
 	// allocate 3 receivers
 	p.ack = newAckReceiver(p.remotech)
-	p.notify = newNotifyReceiver(nil)
+	p.notify = newNotifyReceiver(p.client)
 	p.unknown = newUnauthorizedReceiver()
 
 	p.router.registerReceiver(p.ack)
@@ -230,6 +231,9 @@ func (p *ImcProxy) Stop() {
 	p.router = nil
 	close(p.remotech)
 }
+func (p *ImcProxy) RegisterReceiver(r MessageReceiver) {
+	p.client = r
+}
 
 func NewImcProxy(con net.Conn) *ImcProxy {
 	r := bufio.NewReader(con)
@@ -244,6 +248,7 @@ func NewImcProxy(con net.Conn) *ImcProxy {
 		ack:      nil,
 		notify:   nil,
 		unknown:  nil,
+		client:   nil,
 		remotech: make(chan *ImcCmd),
 	}
 

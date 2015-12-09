@@ -10,6 +10,7 @@ enum CMD_TYPE {
     MODIFYINFO = 2;
     LOGOUT = 3;
     SENDMSG = 4;
+    MESSAGE = 5;
 
     LOGIN_ACK = 101;
     MODIFYINFO_ACK = 102;
@@ -46,6 +47,13 @@ message CmdSendMsg {
     required string MsgBody=2;
 }
 
+message CmdMessage {
+    required string From=1;
+    required string To=2;
+    required string MsgBody=3;
+    required int64 Datetime=4;
+}
+
 message ImcCmd {
     required CMD_TYPE         CmdType=1;
     optional CmdLogin         Login=2;
@@ -53,5 +61,6 @@ message ImcCmd {
     optional CmdAckCommon     AckCommon=4;
     optional CmdLogout        Logout=5;
     optional CmdSendMsg       SendMsg=6;
+    optional CmdMessage       Message=7;
 }
 

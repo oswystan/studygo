@@ -1,7 +1,7 @@
 //===============================================================================
 //                      Copyright (C) 2015 wystan
 //
-//        filename: msg_looper.go
+//        filename: looper.go
 //     description:
 //         created: 2015-12-05 22:25:20
 //          author: wystan

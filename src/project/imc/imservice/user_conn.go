@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -104,7 +105,18 @@ func (u *userConn) doSendMsg(msg *ImcCmd) (data []byte) {
 	peer := GetConnPool().GetUserConn(*msg.SendMsg.PeerName)
 	if peer != nil {
 		//step2: if online send msg to peer
-		peer.onNewMessage(*msg.SendMsg.MsgBody)
+		cmd := CMD_TYPE_MESSAGE
+		dt := time.Now().Unix()
+		peerMsg := &ImcCmd{
+			CmdType: &cmd,
+			Message: &CmdMessage{
+				From:     proto.String(u.userName),
+				To:       proto.String(peer.userName),
+				MsgBody:  msg.SendMsg.MsgBody,
+				Datetime: &dt,
+			},
+		}
+		peer.onNewMessage(peerMsg)
 	}
 
 	//step3: store msg into database
@@ -145,7 +157,9 @@ func (u *userConn) dispatchMsg(msg *ImcCmd) (data []byte) {
 	}
 }
 
-func (u *userConn) onNewMessage(msg string) error {
+func (u *userConn) onNewMessage(msg *ImcCmd) error {
+	data, _ := proto.Marshal(msg)
+	writeMsgData(u.writer, data)
 	return nil
 }
 

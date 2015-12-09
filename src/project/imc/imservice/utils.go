@@ -1,7 +1,7 @@
 //===============================================================================
 //                      Copyright (C) 2015 wystan
 //
-//        filename: msg_utils.go
+//        filename: utils.go
 //     description:
 //         created: 2015-12-06 18:13:09
 //          author: wystan
