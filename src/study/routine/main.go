@@ -42,7 +42,6 @@ type MicroServiceRunner struct {
 
 func (sr *MicroServiceRunner) loop() {
 	sr.wg.Add(1)
-	sr.status = SERVICE_RUNNING
 
 LOOP:
 	for {
@@ -65,23 +64,43 @@ LOOP:
 }
 
 func (sr *MicroServiceRunner) Start(h Handler) {
+	if sr.status != SERVICE_STOP {
+		return
+	}
+
 	if h != nil {
 		sr.handler = h
 	}
+	sr.chr = make(chan interface{}, 10)
+	sr.chw = make(chan interface{}, 10)
+	sr.chq = make(chan int)
+
+	sr.status = SERVICE_RUNNING
 	go sr.loop()
 }
 func (sr *MicroServiceRunner) Stop() {
+	// do not check the current status.
+	// do the following step anyway
 	sr.chq <- 1
 	sr.wg.Wait()
+	close(sr.chr)
+	close(sr.chw)
+	close(sr.chq)
 }
 func (sr *MicroServiceRunner) Status() int {
 	return sr.status
 }
 func (sr *MicroServiceRunner) Send(data interface{}) error {
+	if sr.status != SERVICE_RUNNING {
+		return fmt.Errorf("service is not running")
+	}
 	sr.chr <- data
 	return nil
 }
 func (sr *MicroServiceRunner) Receive() (interface{}, error) {
+	if sr.status != SERVICE_RUNNING {
+		return nil, fmt.Errorf("service is not running")
+	}
 	data := <-sr.chw
 	return data, nil
 }
@@ -89,9 +108,6 @@ func (sr *MicroServiceRunner) Receive() (interface{}, error) {
 func NewMicroServiceRunner(h Handler) *MicroServiceRunner {
 	return &MicroServiceRunner{
 		handler: h,
-		chr:     make(chan interface{}, 10),
-		chw:     make(chan interface{}, 10),
-		chq:     make(chan int),
 		status:  SERVICE_STOP,
 	}
 }
@@ -127,15 +143,15 @@ func main() {
 		as.Send(fmt.Sprintf("%d", i))
 	}
 	for i := 0; i < 10; i++ {
-		result, _ := as.Receive()
-		fmt.Printf("result=%s\n", result.(string))
+		result, err := as.Receive()
+		if err == nil {
+			fmt.Printf("result=%s\n", result.(string))
+		}
 	}
-	fmt.Printf("status : %d\n", as.Status())
 
+	fmt.Printf("status : %d\n", as.Status())
 	as.Stop()
-
 	fmt.Printf("status : %d\n", as.Status())
-	fmt.Printf("hello\n")
 }
 
 /**************************************** END ***********************************/
