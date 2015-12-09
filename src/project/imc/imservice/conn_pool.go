@@ -7,7 +7,7 @@
 //          author: wystan
 //
 //===============================================================================
-package imc_lib
+package imservice
 
 import "sync"
 

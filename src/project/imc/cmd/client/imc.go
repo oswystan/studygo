@@ -13,7 +13,7 @@ package main
 import (
 	"log"
 	"net"
-	imc "project/imc/imc_lib"
+	imc "project/imc/imservice"
 )
 
 func main() {

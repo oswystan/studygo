@@ -3,7 +3,7 @@
 // all messages used by the current chat server and client
 //
 //=========================================================
-package imc_lib;
+package imservice;
 
 enum CMD_TYPE {
     LOGIN = 1;
