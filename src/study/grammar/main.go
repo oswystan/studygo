@@ -13,6 +13,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"unsafe"
 )
 
 //=================================
@@ -183,6 +184,12 @@ func visiability() {
 	t.change()
 	fmt.Printf("t.value=%d\n", t.value)
 }
+func sizeof() {
+	var a int = 0
+	var c bool = true
+	fmt.Printf("sizeof(int)=%d\n", unsafe.Sizeof(a))
+	fmt.Printf("sizeof(bool)=%d\n", unsafe.Sizeof(c))
+}
 
 func main() {
 	//breakLoop()
@@ -193,6 +200,7 @@ func main() {
 	//receiver()
 	//embededFunc()
 	//visiability()
+	//sizeof()
 }
 
 //==================================== END ======================================
