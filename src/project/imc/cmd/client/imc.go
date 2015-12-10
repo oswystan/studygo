@@ -18,7 +18,7 @@ import (
 var commands = [...]string{
 	"login wangyu 123456",
 	"modify wangyu 1234 oswystan",
-	"talk momo hello momo how are you doing?",
+	"talk momo hello momo, how are you doing?",
 	"logout momo",
 }
 
