@@ -1,0 +1,39 @@
+heap profile: 26: 205184 [42: 336256] @ heap/1048576
+25: 204800 [25: 204800] @ 0x23ca 0x2bb30 0x57701
+#	0x23ca	main.main+0x32a		/Users/ossabrina/usr/project/studygo/src/study/pprof/main.go:54
+#	0x2bb30	runtime.main+0x2b0	/usr/local/go/src/runtime/proc.go:111
+
+1: 384 [1: 384] @ 0x32957 0x26f6f 0x2d090 0x2cc39 0x54fb2
+#	0x32957	runtime.malg+0x27		/usr/local/go/src/runtime/proc1.go:2188
+#	0x26f6f	runtime.mpreinit+0x1f		/usr/local/go/src/runtime/os1_darwin.go:129
+#	0x2d090	runtime.mcommoninit+0x100	/usr/local/go/src/runtime/proc1.go:114
+#	0x2cc39	runtime.schedinit+0x79		/usr/local/go/src/runtime/proc1.go:57
+#	0x54fb2	runtime.rt0_go+0x132		/usr/local/go/src/runtime/asm_amd64.s:109
+
+0: 0 [16: 131072] @ 0x228d 0x2bb30 0x57701
+#	0x228d	main.main+0x1ed		/Users/ossabrina/usr/project/studygo/src/study/pprof/main.go:44
+#	0x2bb30	runtime.main+0x2b0	/usr/local/go/src/runtime/proc.go:111
+
+
+# runtime.MemStats
+# Alloc = 33634208
+# TotalAlloc = 42035488
+# Sys = 38799608
+# Lookups = 4
+# Mallocs = 5425
+# Frees = 1060
+# HeapAlloc = 33634208
+# HeapSys = 34275328
+# HeapIdle = 376832
+# HeapInuse = 33898496
+# HeapReleased = 0
+# HeapObjects = 4365
+# Stack = 327680 / 327680
+# MSpan = 463680 / 475136
+# MCache = 4832 / 16384
+# BuckHashSys = 1443174
+# NextGC = 51508984
+# PauseNs = [534017 206420 174205 185481 386663 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+# NumGC = 5
+# EnableGC = true
+# DebugGC = false
