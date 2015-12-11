@@ -26,7 +26,40 @@
 
 	- 程序作为一个服务一直运行不退出，这样需要在代码中开启一个http服务，然后通过（请参考`net/http/pprof`包的使用说明）：
 ```
-	go tool pprof -text $appname http://localhost:$port/debug/pprof/heap
+	go tool pprof -text $appname http://localhost:$port/debug/pprof/heap 
 ```
 - golang的内存GC时机是在内存增长到2的幂次方的时候，通过测试发现，如果先申请，然后将指针置空，golang是不会启动GC的，除非手动调用`runtime.GC()`函数。
-- golang貌似没有栈内存，只有堆内存
+- golang貌似没有栈内存，只有堆
+
+## 2015年12月11日
+### 目标
+- 改造之前的MicroSerice接口，以让其适应多客户端并发访问的场景；
+- 学习POSA3中的资源管理模式，以便在当前的IMC项目中可以使用；
+
+### 总结
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
