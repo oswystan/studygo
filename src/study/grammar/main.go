@@ -218,6 +218,22 @@ func slice() {
 	a = nil
 }
 
+//=================================
+// channel
+//		- select a nil channel will wait for ever.
+//      - in 'case' it will read or write to the channel. so
+//			if you want to receive the data from channel ,
+//			you must put a variable on the left or right;
+//=================================
+func channel() {
+	ch := make(chan int, 1)
+	ch <- 3
+	select {
+	case c := <-ch:
+		fmt.Printf("c=%d\n", c)
+	}
+}
+
 func main() {
 	//breakLoop()
 	//continueLoop()
@@ -229,6 +245,7 @@ func main() {
 	//visiability()
 	//sizeof()
 	//slice()
+	channel()
 }
 
 //==================================== END ======================================
