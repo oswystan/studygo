@@ -184,11 +184,38 @@ func visiability() {
 	t.change()
 	fmt.Printf("t.value=%d\n", t.value)
 }
+
+//=================================
+// show how to know the size of each type
+//=================================
 func sizeof() {
 	var a int = 0
 	var c bool = true
 	fmt.Printf("sizeof(int)=%d\n", unsafe.Sizeof(a))
 	fmt.Printf("sizeof(bool)=%d\n", unsafe.Sizeof(c))
+}
+
+//=================================
+// slice
+//		a slice = nil (without make)
+//		after make, all entries in slice is initialized to 0
+//=================================
+func slice() {
+	var a []int
+	if a != nil {
+		fmt.Printf("not nil\n")
+	} else {
+		fmt.Printf("nil\n")
+	}
+
+	a = make([]int, 10, 11)
+	fmt.Printf("len(a)=%d cap(a)=%d\n", len(a), cap(a))
+	for idx, v := range a {
+		fmt.Printf("a[%d]=%d\n", idx, v)
+	}
+
+	// DON'T know whether it it correct to do so
+	a = nil
 }
 
 func main() {
@@ -201,6 +228,7 @@ func main() {
 	//embededFunc()
 	//visiability()
 	//sizeof()
+	//slice()
 }
 
 //==================================== END ======================================
