@@ -24,10 +24,14 @@ var commands = [...]string{
 
 func main() {
 	log.Println("client started ...")
-	helper := imservice.NewHelper()
-	helper.Connect("localhost", "8000")
-
 	var err error
+	helper := imservice.NewHelper()
+	err = helper.Connect("localhost", "8000")
+	if err != nil {
+		log.Println("fail to connect server: ", err)
+		return
+	}
+
 	for i := 0; i < len(commands); i++ {
 		if err = helper.RunCommand(commands[i]); err != nil {
 			log.Printf("Fail to run command:%s[%s]", commands[i], err)

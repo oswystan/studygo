@@ -117,7 +117,7 @@ func (h *Helper) Close() error {
 
 func NewHelper() *Helper {
 	helper := &Helper{proxy: nil}
-	helper.messageCh = make(chan *Message)
+	helper.messageCh = make(chan *Message, 10)
 	helper.receiver = &receiver{ch: helper.messageCh}
 	return helper
 }
