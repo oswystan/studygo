@@ -224,13 +224,20 @@ func slice() {
 //      - in 'case' it will read or write to the channel. so
 //			if you want to receive the data from channel ,
 //			you must put a variable on the left or right;
+//      - len(ch) = data len which has been enqueued into channel
+//      - cap(ch) = the total capacity of channel when it is created.
 //=================================
 func channel() {
-	ch := make(chan int, 1)
+	ch := make(chan int, 10)
+	fmt.Printf("len(ch)=%d\n", len(ch))
 	ch <- 3
+	fmt.Printf("len(ch)=%d cap(ch)=%d\n", len(ch), cap(ch))
 	select {
-	case c := <-ch:
-		fmt.Printf("c=%d\n", c)
+	//even there is no receiver here,
+	//the data will always be dequeued from channel
+	//so len(ch)=0 HERE after case.
+	case <-ch:
+		fmt.Printf("len(ch)=%d\n", len(ch))
 	}
 }
 
