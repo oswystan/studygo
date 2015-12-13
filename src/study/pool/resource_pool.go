@@ -12,6 +12,7 @@ package main
 
 import (
 	"container/list"
+	"fmt"
 	"log"
 	"sync"
 )
@@ -57,6 +58,16 @@ func (lp *ResourcePool) Release(r interface{}) {
 	}
 	lp.avaliable.PushBack(r)
 	lp.Unlock()
+}
+
+func (lp *ResourcePool) Status() string {
+	lp.RLock()
+	defer lp.RUnlock()
+	return fmt.Sprintf("max:%d allocated:%d acquired:%d avaliable:%d",
+		lp.max,
+		lp.amount,
+		lp.amount-lp.avaliable.Len(),
+		lp.avaliable.Len())
 }
 
 func (lp *ResourcePool) Reset() {

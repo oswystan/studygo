@@ -9,7 +9,10 @@
 //===============================================================================
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 type item struct {
 	/* data */
@@ -32,6 +35,7 @@ func TestLazyPool(t *testing.T) {
 		if slice[i].value != 1 {
 			t.Errorf("invalid item value=%d", slice[i].value)
 		}
+		fmt.Printf("%s\n", p.Status())
 	}
 
 	v := p.Acquire()
@@ -42,6 +46,7 @@ func TestLazyPool(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		p.Release(slice[i])
 	}
+	fmt.Printf("%s\n", p.Status())
 
 	for i := 0; i < 10; i++ {
 		v := p.Acquire()
