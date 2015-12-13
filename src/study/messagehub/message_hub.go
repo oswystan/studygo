@@ -17,11 +17,16 @@ import (
 	"sync"
 )
 
+const (
+	MESSAGE_CACHED_THRESHOLD = 20
+)
+
 type Subscriber interface {
 	NewMessage(msg interface{})
 }
 type Archiver interface {
 	ArchiveMessage(msg interface{})
+	IsBusy() bool
 }
 
 type MessageHub struct {
@@ -30,15 +35,6 @@ type MessageHub struct {
 	archiver Archiver
 	msglock  sync.RWMutex
 	messages *list.List
-}
-
-func clearList(l *list.List) {
-	if l == nil {
-		return
-	}
-	for e := l.Front(); e != nil; e = e.Next() {
-		l.Remove(e)
-	}
 }
 
 func (hub *MessageHub) NewTopic(topic string) error {
@@ -85,8 +81,37 @@ func (hub *MessageHub) PublishMessage(topic string, msg interface{}) error {
 		sub.NewMessage(msg)
 	}
 
+	hub.msglock.Lock()
+	defer hub.msglock.Unlock()
+	hub.messages.PushBack(msg)
+
+	if hub.archiver != nil {
+		// trigger the archiver to store the message
+		for hub.messages.Len() >= MESSAGE_CACHED_THRESHOLD && !hub.archiver.IsBusy() {
+			e := hub.messages.Front()
+			hub.archiver.ArchiveMessage(e.Value)
+			hub.messages.Remove(e)
+		}
+	} else {
+		hub.messages.Remove(hub.messages.Front())
+	}
+
 	return nil
 }
+func (hub *MessageHub) Flush() {
+	hub.msglock.Lock()
+	defer hub.msglock.Unlock()
+	if hub.archiver == nil {
+		hub.messages = hub.messages.Init()
+		return
+	}
+
+	for e := hub.messages.Front(); e != nil; e = e.Next() {
+		hub.archiver.ArchiveMessage(e.Value)
+	}
+	hub.messages = hub.messages.Init()
+}
+
 func (hub *MessageHub) Subscribe(topic string, sub Subscriber) error {
 	hub.Lock()
 	defer hub.Unlock()
@@ -119,7 +144,7 @@ func (hub *MessageHub) Unsubscribe(topic string, sub Subscriber) error {
 	return nil
 }
 func (hub *MessageHub) RegisterArchiver(ar Archiver) error {
-	if hub.archiver != nil {
+	if hub.archiver == nil {
 		hub.archiver = ar
 	} else {
 		fmt.Errorf("already have a archiver %v", hub.archiver)
