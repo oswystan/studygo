@@ -193,9 +193,11 @@ func sizeof() {
 	var a int = 0
 	var c bool = true
 	var d struct{} = struct{}{}
+	var m map[int]string
 	fmt.Printf("sizeof(int)=%d\n", unsafe.Sizeof(a))
 	fmt.Printf("sizeof(bool)=%d\n", unsafe.Sizeof(c))
 	fmt.Printf("sizeof(struct{})=%d\n", unsafe.Sizeof(d))
+	fmt.Printf("sizeof(map[int]string)=%d\n", unsafe.Sizeof(m))
 }
 
 //=================================
@@ -230,8 +232,13 @@ func slice() {
 //      - len(ch) = data len which has been enqueued into channel
 //      - cap(ch) = the total capacity of channel when it is created.
 //
+// about nil channel and closed channel
 //		- a closed channel can still use len() to get the data len in it
 //			also you can read data from it.
+//      - A send to a nil channel blocks forever
+//		- A receive from a nil channel blocks forever
+//		- A send to a closed channel panics
+//		- A receive from a closed channel returns the zero value immediately
 //=================================
 func channel() {
 	ch := make(chan int, 10)
@@ -292,9 +299,9 @@ func main() {
 	//receiver()
 	//embededFunc()
 	//visiability()
-	//sizeof()
+	sizeof()
 	//slice()
-	channel()
+	//channel()
 	//closechstruct()
 }
 
