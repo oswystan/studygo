@@ -1,6 +1,8 @@
 ##golang建议
 - 非常好的参考文档 [Effective go](https://golang.org/doc/effective_go.html)
 - 注意成对原则，打开的文件、socket等都要用defer关闭
+- 在项目中对error进行统一管理，在一个独立的文件中存放所有的error
+- 使用go vendor特性对第三方依赖包进行统一存放，并提供url，版本信息，另外第三方包可能也会有外部依赖，把所有依赖统一存放到一个目录下，这样便于管理。
 
 
 ##语法注意事项
