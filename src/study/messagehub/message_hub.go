@@ -140,7 +140,6 @@ func (hub *MessageHub) Unsubscribe(topic string, sub Subscriber) error {
 		}
 	}
 
-	log.Printf("subscriber does not subscribe topic %s", topic)
 	return nil
 }
 func (hub *MessageHub) RegisterArchiver(ar Archiver) error {
