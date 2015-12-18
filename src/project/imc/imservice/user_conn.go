@@ -142,7 +142,7 @@ func (u *userConn) dispatchMsg(msg *ImcCmd) (data []byte) {
 	if fn, ok := dispatcher[*msg.CmdType]; ok {
 		return fn(msg)
 	} else {
-		cmd := CMD_TYPE_MODIFYINFO_ACK
+		cmd := CMD_TYPE_UNKNOWN_ACK
 		status := RET_CODE_FAILED
 		desc := fmt.Sprintf("unauthorized command type <%s>", msg.CmdType.String())
 		ack := &ImcCmd{
