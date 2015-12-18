@@ -11,6 +11,7 @@
 package main
 
 import (
+	"container/list"
 	"fmt"
 	"sync"
 	"time"
@@ -290,6 +291,42 @@ func closechstruct() {
 	fmt.Printf("Waited %v for goroutine to stop\n", time.Since(t0))
 }
 
+//==================================================
+// env GODEBUG=gctrace=1,schedtrace=1000 ./grammar
+//
+// even one struct{} nested into another struct{} the gc can
+// collect the memory too.
+//==================================================
+func memory() {
+	type stdata struct {
+		data [64 * 1024]byte
+	}
+	type stmemory struct {
+		used int
+		data *stdata
+	}
+
+	list := list.New()
+	i := 0
+	for {
+		c := new(stmemory)
+		d := new(stdata)
+		c.data = d
+		list.PushBack(c)
+		time.Sleep(10 * time.Millisecond)
+		if c == nil {
+			break
+		}
+		i++
+		if i%1024 == 0 {
+			i = 0
+			//this will cause gc to collect memory to the minimal size
+			fmt.Printf("do list init\n")
+			list.Init()
+		}
+	}
+}
+
 func main() {
 	//breakLoop()
 	//continueLoop()
@@ -299,10 +336,11 @@ func main() {
 	//receiver()
 	//embededFunc()
 	//visiability()
-	sizeof()
+	//sizeof()
 	//slice()
 	//channel()
 	//closechstruct()
+	//memory()
 }
 
 //==================================== END ======================================
