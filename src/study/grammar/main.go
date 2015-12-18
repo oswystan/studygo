@@ -12,6 +12,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"time"
 	"unsafe"
 )
@@ -191,8 +192,10 @@ func visiability() {
 func sizeof() {
 	var a int = 0
 	var c bool = true
+	var d struct{} = struct{}{}
 	fmt.Printf("sizeof(int)=%d\n", unsafe.Sizeof(a))
 	fmt.Printf("sizeof(bool)=%d\n", unsafe.Sizeof(c))
+	fmt.Printf("sizeof(struct{})=%d\n", unsafe.Sizeof(d))
 }
 
 //=================================
@@ -226,6 +229,9 @@ func slice() {
 //			you must put a variable on the left or right;
 //      - len(ch) = data len which has been enqueued into channel
 //      - cap(ch) = the total capacity of channel when it is created.
+//
+//		- a closed channel can still use len() to get the data len in it
+//			also you can read data from it.
 //=================================
 func channel() {
 	ch := make(chan int, 10)
@@ -239,6 +245,42 @@ func channel() {
 	case <-ch:
 		fmt.Printf("len(ch)=%d\n", len(ch))
 	}
+	close(ch)
+	if ch == nil {
+		fmt.Printf("a closed channel = nil\n")
+	} else {
+		fmt.Printf("a closed channel != nil\n")
+	}
+
+	//close channel
+	fmt.Printf("close channel: \n")
+	ch2 := make(chan bool, 2)
+	ch2 <- true
+	ch2 <- true
+	close(ch2)
+	fmt.Printf("len(ch2)=%d\n", len(ch2))
+	for i := 0; i < cap(ch2)+1; i++ {
+		v, ok := <-ch2
+		fmt.Println(v, ok)
+	}
+}
+
+func closechstruct() {
+	finish := make(chan struct{})
+	var done sync.WaitGroup
+	done.Add(1)
+	go func() {
+		select {
+		// a VERY USEFUL way to do timeout
+		case <-time.After(1 * time.Hour):
+		case <-finish:
+		}
+		done.Done()
+	}()
+	t0 := time.Now()
+	close(finish)
+	done.Wait()
+	fmt.Printf("Waited %v for goroutine to stop\n", time.Since(t0))
 }
 
 func main() {
@@ -253,6 +295,7 @@ func main() {
 	//sizeof()
 	//slice()
 	channel()
+	//closechstruct()
 }
 
 //==================================== END ======================================
