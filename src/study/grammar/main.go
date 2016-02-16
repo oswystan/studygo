@@ -343,7 +343,7 @@ func main() {
 	//vartypes()
 	//embededFunc()
 	//visiability()
-	sizeof()
+	//sizeof()
 	//slice()
 	//channel()
 	//closechstruct()
