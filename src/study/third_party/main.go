@@ -12,7 +12,7 @@
 // 1. export GO15VENDOREXPERIMENT=1
 // 2. go build
 // or
-// 1. env export GO15VENDOREXPERIMENT=1 go build
+// 1. env GO15VENDOREXPERIMENT=1 go build
 //=======================================
 package main
 
