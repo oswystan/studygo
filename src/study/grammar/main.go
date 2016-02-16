@@ -150,11 +150,14 @@ type TypeB struct {
 }
 
 func (b *TypeB) RunIt() {
-	fmt.Printf("TypeB is run\n")
+	fmt.Printf("TypeB is run it\n")
 }
 
 type TypeC struct {
-	/* data */
+
+	// if the following types have the same member function(s),
+	// you need to give a variable name to tell the compiler which
+	// function you want to call.
 	*TypeA
 	*TypeB
 }
@@ -182,6 +185,9 @@ func (t *onetype) change() {
 
 func visiability() {
 	t := &onetype{}
+
+	// you can set the member value outside the member function
+	// but you can not set the member value outside the current package.
 	t.value = 1
 	t.change()
 	fmt.Printf("t.value=%d\n", t.value)
@@ -195,10 +201,12 @@ func sizeof() {
 	var c bool = true
 	var d struct{} = struct{}{}
 	var m map[int]string
+	var s string
 	fmt.Printf("sizeof(int)=%d\n", unsafe.Sizeof(a))
 	fmt.Printf("sizeof(bool)=%d\n", unsafe.Sizeof(c))
 	fmt.Printf("sizeof(struct{})=%d\n", unsafe.Sizeof(d))
 	fmt.Printf("sizeof(map[int]string)=%d\n", unsafe.Sizeof(m))
+	fmt.Printf("sizeof(string)=%d\n", unsafe.Sizeof(s))
 }
 
 //=================================
@@ -235,7 +243,6 @@ func slice() {
 //
 // about nil channel and closed channel
 //		- a closed channel can still use len() to get the data len in it
-//			also you can read data from it.
 //      - A send to a nil channel blocks forever
 //		- A receive from a nil channel blocks forever
 //		- A send to a closed channel panics
@@ -245,7 +252,7 @@ func channel() {
 	ch := make(chan int, 10)
 	fmt.Printf("len(ch)=%d\n", len(ch))
 	ch <- 3
-	fmt.Printf("len(ch)=%d cap(ch)=%d\n", len(ch), cap(ch))
+	fmt.Printf("after push 3 into it, len(ch)=%d cap(ch)=%d\n", len(ch), cap(ch))
 	select {
 	//even there is no receiver here,
 	//the data will always be dequeued from channel
@@ -294,7 +301,7 @@ func closechstruct() {
 //==================================================
 // env GODEBUG=gctrace=1,schedtrace=1000 ./grammar
 //
-// even one struct{} nested into another struct{} the gc can
+// even one struct{xxx} nested into another struct{xxx} the gc can
 // collect the memory too.
 //==================================================
 func memory() {
@@ -332,15 +339,15 @@ func main() {
 	//continueLoop()
 	//deferUse()
 	//vardef()
-	//vartypes()
 	//receiver()
+	//vartypes()
 	//embededFunc()
 	//visiability()
 	//sizeof()
 	//slice()
 	//channel()
 	//closechstruct()
-	//memory()
+	memory()
 }
 
 //==================================== END ======================================
