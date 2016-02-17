@@ -8,9 +8,12 @@ pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
 ## initilize database
 psql -f pg.sql
 
+## build
+go build
 
 ## start server
+./tantan
 
 
 ## test
-
+st.sh
