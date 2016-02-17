@@ -15,9 +15,17 @@ import (
 )
 
 func main() {
-	r := NewRouter()
 	log.Printf("starting server...")
+	db := GetDB()
+	if err := db.Connect("socialdb", "pgtest", "123456"); err != nil {
+		log.Printf("ERROR: %s", err)
+		return
+	}
+	log.Printf("database connected")
+
+	r := NewRouter()
 	log.Fatal(http.ListenAndServe(":8000", r))
+	db.Disconnect()
 }
 
 //==================================== END ======================================

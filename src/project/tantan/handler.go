@@ -16,6 +16,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type User struct {
@@ -25,9 +28,13 @@ type User struct {
 }
 
 type Relationship struct {
-	Id    int64  `json:"id"`
-	State string `json:"state"`
-	Type  string `json:"type"`
+	Id        int64  `json:"id"`
+	State     string `json:"state"`
+	Type      string `json:"type"`
+	Peer1     int64  `json:"-"`
+	Peer2     int64  `json:"-"`
+	Relation1 int    `json:"-"`
+	Relation2 int    `json:"-"`
 }
 
 func listUsers(w http.ResponseWriter, r *http.Request) {
@@ -36,15 +43,18 @@ func listUsers(w http.ResponseWriter, r *http.Request) {
 	var ul []User
 	var err error
 	if ul, err = GetDB().ListUsers(); err != nil {
+		log.Printf("ERROR: fail to get user list %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	encoder := json.NewEncoder(w)
+	w.Write([]byte("[\n"))
 	for i := 0; i < len(ul); i++ {
 		encoder.Encode(&ul[i])
 	}
+	w.Write([]byte("]\n"))
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
@@ -82,14 +92,58 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 func getRelationships(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("getRelationships\n"))
+
+	// get userid from url
+	vars := mux.Vars(r)
+	uid, _ := strconv.ParseInt(vars["uid"], 10, 64)
+	db := GetDB()
+	rs, err := db.GetRelationships(uid)
+	if err != nil || rs == nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("ERROR: %s", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	encoder := json.NewEncoder(w)
+	w.Write([]byte("[\n"))
+	for i := 0; i < len(rs); i++ {
+		encoder.Encode(&rs[i])
+	}
+	w.Write([]byte("]\n"))
 }
 
 func createRelationship(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("createRelationship\n"))
+	vars := mux.Vars(r)
+	id1, _ := strconv.ParseInt(vars["uid"], 10, 64)
+	id2, _ := strconv.ParseInt(vars["otheruid"], 10, 64)
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 128))
+	if err != nil {
+		log.Printf("ERROR: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	r.Body.Close()
+	rs := &Relationship{}
+	if err := json.Unmarshal(body, rs); err != nil {
+		log.Printf("ERROR: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	db := GetDB()
+	rs, err = db.CreateRelationship(id1, id2, rs.State)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("ERROR: %s", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(rs)
 }
 
 //==================================== END ======================================
