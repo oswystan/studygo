@@ -5,14 +5,14 @@
 
 all: build 
 
-build:
-	@ echo "build tantan..."
-	@ go build
-	@ echo "done."
+build: tantan
 
-install:
+tantan: 
+	@ go build
+
+install: tantan
 	@ echo "installing ..."
-	@ psql -U postgres -f ./pg.sql
+	@ psql -f ./pg.sql
 	@ echo "done."
 
 test: install

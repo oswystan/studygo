@@ -50,8 +50,8 @@ show_db()
 {
     log "================================================="
     log "database data:"
-    psql -U postgres -d $db -c "select * from users;"
-    psql -U postgres -d $db -c "select * from relationships;"
+    psql -d $db -c "select * from users;"
+    psql -d $db -c "select * from relationships;"
     log "================================================="
 }
 
@@ -75,13 +75,13 @@ get_rs()
 clear_db()
 {
     log "clear database data..."
-    psql -U postgres -d $db -c "delete from users; delete from relationships; alter sequence users_id_seq restart with 1" 1>/dev/null
+    psql -d $db -c "delete from users; delete from relationships; alter sequence users_id_seq restart with 1" 1>/dev/null
     log "done."
 }
 
 rm_db()
 {
-    psql -U postgres -c "drop database if exists socialdb"
+    psql -c "drop database if exists socialdb"
 }
 
 
