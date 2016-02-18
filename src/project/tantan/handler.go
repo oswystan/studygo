@@ -49,12 +49,7 @@ func listUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	encoder := json.NewEncoder(w)
-	w.Write([]byte("[\n"))
-	for i := 0; i < len(ul); i++ {
-		encoder.Encode(&ul[i])
-	}
-	w.Write([]byte("]\n"))
+	json.NewEncoder(w).Encode(ul)
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
@@ -105,12 +100,7 @@ func getRelationships(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	encoder := json.NewEncoder(w)
-	w.Write([]byte("[\n"))
-	for i := 0; i < len(rs); i++ {
-		encoder.Encode(&rs[i])
-	}
-	w.Write([]byte("]\n"))
+	json.NewEncoder(w).Encode(rs)
 }
 
 func createRelationship(w http.ResponseWriter, r *http.Request) {

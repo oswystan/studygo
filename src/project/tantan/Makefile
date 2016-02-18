@@ -8,7 +8,9 @@ all: build
 build: tantan
 
 tantan: 
+	@ echo "building ..."
 	@ go build
+	@ echo "done."
 
 install: tantan
 	@ echo "installing ..."
