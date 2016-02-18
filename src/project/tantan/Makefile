@@ -12,7 +12,7 @@ build:
 
 install:
 	@ echo "installing ..."
-	@ psql -f ./pg.sql
+	@ psql -U postgres -f ./pg.sql
 	@ echo "done."
 
 test: install

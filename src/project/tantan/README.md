@@ -11,3 +11,6 @@ make
 ## test
 make install
 make test
+
+## clean
+make clean
