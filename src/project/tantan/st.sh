@@ -3,46 +3,6 @@
 log_file="log.txt"
 db="socialdb"
 
-create_user()
-{
-    echo "create users ...."
-    curl -XPOST -d '{"name":"mark"}' "http://localhost:8000/users"
-    curl -XPOST -d '{"name":"sherlock"}' "http://localhost:8000/users"
-    curl -XPOST -d '{"name":"john"}' "http://localhost:8000/users"
-    curl -XPOST -d '{"name":"tom"}' "http://localhost:8000/users"
-    echo "done."
-}
-get_user()
-{
-    echo "get user list..."
-    curl -XGET "http://localhost:8000/users"
-    echo "done."
-}
-
-show_db()
-{
-    psql -d $db -c "select * from users;"
-    psql -d $db -c "select * from relationships;"
-}
-
-create_rs()
-{
-    echo "create relationships...."
-    curl -XPUT -d '{"state":"liked"}' "http://localhost:8000/users/1/relationships/2"
-    curl -XPUT -d '{"state":"liked"}' "http://localhost:8000/users/2/relationships/1"
-    curl -XPUT -d '{"state":"disliked"}' "http://localhost:8000/users/2/relationships/3"
-    echo "done."
-}
-
-get_rs()
-{
-    echo "get relationships..."
-    curl -XGET "http://localhost:8000/users/1/relationships"
-    curl -XGET "http://localhost:8000/users/2/relationships"
-    echo "done."
-}
-
-
 ################################
 # some basic functions for log
 ################################
@@ -70,10 +30,60 @@ log_end()
     echo "[${strNow}]##########################################################"
 }
 
+create_user()
+{
+    log "create users ...."
+    curl -XPOST -d '{"name":"mark"}' "http://localhost:8000/users"
+    curl -XPOST -d '{"name":"sherlock"}' "http://localhost:8000/users"
+    curl -XPOST -d '{"name":"john"}' "http://localhost:8000/users"
+    curl -XPOST -d '{"name":"tom"}' "http://localhost:8000/users"
+    log "done."
+}
+get_user()
+{
+    log "get user list..."
+    curl -XGET "http://localhost:8000/users"
+    log "done."
+}
+
+show_db()
+{
+    log "================================================="
+    log "database data:"
+    psql -d $db -c "select * from users;"
+    psql -d $db -c "select * from relationships;"
+    log "================================================="
+}
+
+create_rs()
+{
+    log "create relationships...."
+    curl -XPUT -d '{"state":"liked"}' "http://localhost:8000/users/1/relationships/2"
+    curl -XPUT -d '{"state":"liked"}' "http://localhost:8000/users/2/relationships/1"
+    curl -XPUT -d '{"state":"disliked"}' "http://localhost:8000/users/2/relationships/3"
+    log "done."
+}
+
+get_rs()
+{
+    log "get relationships..."
+    curl -XGET "http://localhost:8000/users/1/relationships"
+    curl -XGET "http://localhost:8000/users/2/relationships"
+    log "done."
+}
+
 clear_db()
 {
+    log "clear database data..."
     psql -d $db -c "delete from users; delete from relationships; alter sequence users_id_seq restart with 1" 1>/dev/null
+    log "done."
 }
+
+rm_db()
+{
+    psql -c "drop database if exists socialdb"
+}
+
 
 do_work()
 {

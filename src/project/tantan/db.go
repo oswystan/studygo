@@ -12,7 +12,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"gopkg.in/pg.v3"
 )
@@ -30,20 +29,11 @@ type Database struct {
 
 var db *Database = &Database{nil}
 
-var users = []User{
-	{1, "bob", "user"},
-	{2, "mike", "user"},
-	{3, "jason", "user"},
-}
 var states = []string{
 	"",
 	"liked",
 	"disliked",
 	"matched",
-}
-
-var rs = []Relationship{
-	{},
 }
 
 func GetDB() *Database {
@@ -93,6 +83,16 @@ func (db *Database) checkRs(id1 int64, id2 int64) ([]Relationship, error) {
 	_, err := db.pg.Query(&rs, sql)
 	return rs, err
 }
+func (db *Database) clearUser() error {
+	sql := "delete from users; alter sequence users_id_seq restart with 1;"
+	_, err := db.pg.Exec(sql)
+	return err
+}
+func (db *Database) clearRs() error {
+	sql := "delete from relationships;"
+	_, err := db.pg.Exec(sql)
+	return err
+}
 
 func (db *Database) Connect(dbname string, user string, pwd string) error {
 	if db.pg != nil {
@@ -139,7 +139,6 @@ func (db *Database) CreateUser(u *User) error {
 		return err
 	}
 	u.Type = "user"
-	log.Println(u)
 	return nil
 }
 
@@ -193,6 +192,10 @@ func (db *Database) CreateRelationship(id1 int64, id2 int64, state string) (*Rel
 		return nil, fmt.Errorf("invalid relationship %s", rs)
 	}
 
+	if id1 == id2 {
+		return nil, fmt.Errorf("should use different id(%d)", id1)
+	}
+
 	// check whether the uid is existed
 	ul, err := db.checkUserId(id1)
 	if err != nil || len(ul) == 0 {
@@ -222,7 +225,6 @@ func (db *Database) CreateRelationship(id1 int64, id2 int64, state string) (*Rel
 		sql := fmt.Sprintf("insert into relationships values(%d, %d, %d, %d) returning peer1, peer2, relation1, relation2;",
 			p1, p2, r1, r2)
 		_, err = db.pg.QueryOne(r, sql)
-		log.Println(sql)
 	} else {
 		sql := fmt.Sprintf("update relationships set relation1=%d where peer1=%d and peer2=%d returning relation1, relation2;",
 			r1, p1, p2)
@@ -230,7 +232,6 @@ func (db *Database) CreateRelationship(id1 int64, id2 int64, state string) (*Rel
 			sql = fmt.Sprintf("update relationships set relation2=%d where peer1=%d and peer2=%d returning relation1, relation2;",
 				r2, p1, p2)
 		}
-		log.Println(sql)
 		_, err = db.pg.QueryOne(r, sql)
 	}
 	if err != nil {

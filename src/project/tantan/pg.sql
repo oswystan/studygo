@@ -16,7 +16,7 @@ create user pgtest with CREATEDB LOGIN PASSWORD '123456';
 create table users
 (
     id bigserial not null,
-    name varchar(128) not null,
+    name varchar(64) not null,
     primary key(id)
 );
 create unique index users_name on users (name);
@@ -42,5 +42,9 @@ create index rs_peer2 on relationships (peer2, relation2);
 -- insert into relationships values(1, 3, 1, 2);
 -- select * from relationships where (peer1 = 1 and peer2 = 2) or (peer1=2 and peer2=1);
 
-grant all PRIVILEGES on all tables in schema public to pgtest;
-grant all PRIVILEGES on all sequences in schema public to pgtest;
+-- grant all PRIVILEGES on all tables in schema public to pgtest;
+-- grant all PRIVILEGES on all sequences in schema public to pgtest;
+
+alter table users owner to pgtest;
+alter table relationships owner to pgtest;
+alter sequence users_id_seq owner to pgtest;
