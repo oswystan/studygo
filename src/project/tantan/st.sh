@@ -81,7 +81,8 @@ clear_db()
 
 rm_db()
 {
-    psql -c "drop database if exists socialdb"
+    psql -c "drop database if exists socialdb;"
+    psql -c "drop user if exists pgtest;"
 }
 
 
