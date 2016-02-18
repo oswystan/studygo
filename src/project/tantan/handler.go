@@ -48,8 +48,15 @@ func listUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	bs, err := json.MarshalIndent(ul, "", "\t")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	bs = append(bs, '\n')
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(ul)
+	w.Write(bs)
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
@@ -77,12 +84,15 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(&user); err != nil {
-		log.Printf("ERROR: %s", err)
+	bs, err := json.MarshalIndent(&user, "", "\t")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	bs = append(bs, '\n')
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(bs)
 }
 
 func getRelationships(w http.ResponseWriter, r *http.Request) {
@@ -99,8 +109,15 @@ func getRelationships(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(rs)
+	bs, err := json.MarshalIndent(&rs, "", "\t")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	bs = append(bs, '\n')
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(bs)
 }
 
 func createRelationship(w http.ResponseWriter, r *http.Request) {
@@ -132,8 +149,15 @@ func createRelationship(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(rs)
+	bs, err := json.MarshalIndent(&rs, "", "\t")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	bs = append(bs, '\n')
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(bs)
 }
 
 //==================================== END ======================================
