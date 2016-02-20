@@ -53,38 +53,33 @@ func postProcessRs(rs []Relationship, p int) {
 		if r.Relation1 == LIKED && r.Relation2 == LIKED {
 			r.State = states[MATCHED]
 		}
-		r.Type = "relationship"
 	}
 
 }
 
 func (db *Database) checkUserId(id int64) ([]User, error) {
 	var ul []User
-	sql := fmt.Sprintf("select * from users where id=%d", id)
-	_, err := db.pg.Query(&ul, sql)
+	_, err := db.pg.Query(&ul, "select * from users where id=?", id)
 	return ul, err
 }
 
 func (db *Database) checkUserName(name string) ([]User, error) {
 	var ul []User
-	sql := fmt.Sprintf("select * from users where name=%s", name)
-	_, err := db.pg.Query(&ul, sql)
+	_, err := db.pg.Query(&ul, "select * from users where name=?", name)
 	return ul, err
 }
 func (db *Database) checkRs(id1 int64, id2 int64) ([]Relationship, error) {
 	var rs []Relationship
-	sql := fmt.Sprintf("select * from relationships where peer1=%d and peer2=%d", id1, id2)
-	_, err := db.pg.Query(&rs, sql)
+	_, err := db.pg.Query(&rs, "select * from relationships where peer1=? and peer2=?",
+		id1, id2)
 	return rs, err
 }
 func (db *Database) clearUser() error {
-	sql := "delete from users; alter sequence users_id_seq restart with 1;"
-	_, err := db.pg.Exec(sql)
+	_, err := db.pg.Exec("delete from users; alter sequence users_id_seq restart with 1;")
 	return err
 }
 func (db *Database) clearRs() error {
-	sql := "delete from relationships;"
-	_, err := db.pg.Exec(sql)
+	_, err := db.pg.Exec("delete from relationships;")
 	return err
 }
 
@@ -127,8 +122,7 @@ func (db *Database) CreateUser(u *User) error {
 	// because a unique index on users.name colomn.
 	// but there is a bad effect: it will cost a squence number :-(
 	// insert it into database
-	sql := fmt.Sprintf("insert into users(name) values('%s') returning id;", u.Name)
-	_, err := db.pg.QueryOne(u, sql)
+	_, err := db.pg.QueryOne(u, "insert into users(name) values(?) returning id;", u.Name)
 	if err != nil {
 		return err
 	}
@@ -143,8 +137,7 @@ func (db *Database) ListUsers() ([]User, error) {
 
 	// TODO we should get page of data
 	var ul []User
-	sql := "select id, name, 'user' as type from users;"
-	_, err := db.pg.Query(&ul, sql)
+	_, err := db.pg.Query(&ul, "select id, name, 'user' as type from users;")
 	if err != nil {
 		return nil, err
 	}
@@ -154,16 +147,16 @@ func (db *Database) ListUsers() ([]User, error) {
 
 func (db *Database) GetRelationships(id int64) ([]Relationship, error) {
 	var rs []Relationship
-	sql := fmt.Sprintf("select *, 'relationship' as type from relationships where peer1=%d and relation1 != 0;", id)
-	_, err := db.pg.Query(&rs, sql)
+	sql := fmt.Sprintf("select *, 'relationship' as type from relationships where peer1=? and relation1 != 0;")
+	_, err := db.pg.Query(&rs, sql, id)
 	if err != nil {
 		return rs, err
 	}
 	idx := len(rs)
 	postProcessRs(rs, 1)
 
-	sql = fmt.Sprintf("select *, 'relationship' as type from relationships where peer2=%d and relation2 != 0;", id)
-	_, err = db.pg.Query(&rs, sql)
+	sql = fmt.Sprintf("select *, 'relationship' as type from relationships where peer2=? and relation2 != 0;")
+	_, err = db.pg.Query(&rs, sql, id)
 	if err != nil {
 		return rs, err
 	}
