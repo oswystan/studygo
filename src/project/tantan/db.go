@@ -185,7 +185,7 @@ func (db *Database) CreateRelationship(id1 int64, id2 int64, state string) (*Rel
 
 	r := &Relationship{}
 
-	_, err := db.pg.QueryOne(r, "select * from create_rs(?,?,?) as t;", id1, id2, rs)
+	_, err := db.pg.QueryOne(r, "select * from create_rs(?,?,?);", id1, id2, rs)
 	if err != nil {
 		return nil, err
 	}
