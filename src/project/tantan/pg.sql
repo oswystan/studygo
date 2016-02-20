@@ -48,3 +48,4 @@ create index rs_peer2 on relationships (peer2, relation2);
 alter table users owner to pgtest;
 alter table relationships owner to pgtest;
 alter sequence users_id_seq owner to pgtest;
+
