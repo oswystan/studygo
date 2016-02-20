@@ -48,4 +48,48 @@ create index rs_peer2 on relationships (peer2, relation2);
 alter table users owner to pgtest;
 alter table relationships owner to pgtest;
 alter sequence users_id_seq owner to pgtest;
+select * from users;
+
+create or replace function create_rs(id1 int, id2 int, state int) returns setof relationships as $$
+    declare
+        p1 bigint := 0;
+        p2 bigint := 0;
+        r1 int := 0;
+        r2 int := 0;
+        userid bigint := 0;
+        rec record;
+
+    begin
+        select id from users where id=id1 into userid;
+        if not found then
+            raise exception 'can not find user %', id1;
+        end if;
+        select id from users where id=id2 into userid;
+        if not found then
+            raise exception 'can not find user %', id2;
+        end if;
+
+        if id1 > id2 then
+            p1 = id2;
+            p2 = id1;
+            r2 = state;
+        else
+            p1 = id1;
+            p2 = id2;
+            r1 = state;
+        end if;
+        
+        select * from relationships where peer1 = p1 and peer2 = p2 into rec;
+        if not found then
+            return query insert into relationships values (p1, p2, r1, r2) returning *;
+        else
+            if r1 > 0 then
+                return query update relationships set relation1 = r1 where peer1=p1 and peer2=p2 returning *;
+            else
+                return query update relationships set relation2 = r2 where peer1=p1 and peer2=p2 returning *;
+            end if;
+        end if;
+    end;
+
+$$ language plpgsql;
 

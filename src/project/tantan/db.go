@@ -135,7 +135,7 @@ func (db *Database) ListUsers() ([]User, error) {
 		return nil, fmt.Errorf("database disconnected!")
 	}
 
-	// TODO we should get page of data
+	// TODO we should return data by page
 	var ul []User
 	_, err := db.pg.Query(&ul, "select id, name, 'user' as type from users;")
 	if err != nil {
@@ -155,7 +155,8 @@ func (db *Database) GetRelationships(id int64) ([]Relationship, error) {
 	idx := len(rs)
 	postProcessRs(rs, 1)
 
-	sql = fmt.Sprintf("select *, 'relationship' as type from relationships where peer2=? and relation2 != 0;")
+	sql = fmt.Sprintf(`select *, 'relationship' as type from relationships 
+			where peer2=? and relation2 != 0;`)
 	_, err = db.pg.Query(&rs, sql, id)
 	if err != nil {
 		return rs, err
@@ -168,7 +169,7 @@ func (db *Database) GetRelationships(id int64) ([]Relationship, error) {
 	return rs, nil
 }
 func (db *Database) CreateRelationship(id1 int64, id2 int64, state string) (*Relationship, error) {
-	var p1, p2, r1, r2, rs int64
+	var rs int64
 	switch state {
 	case "liked":
 		rs = LIKED
@@ -182,44 +183,9 @@ func (db *Database) CreateRelationship(id1 int64, id2 int64, state string) (*Rel
 		return nil, fmt.Errorf("should use different id(%d)", id1)
 	}
 
-	// check whether the uid is existed
-	ul, err := db.checkUserId(id1)
-	if err != nil || len(ul) == 0 {
-		return nil, fmt.Errorf("No user found for id %d", id1)
-	}
-	ul, err = db.checkUserId(id2)
-	if err != nil || len(ul) == 0 {
-		return nil, fmt.Errorf("No user found for id %d", id2)
-	}
-
-	if id1 < id2 {
-		p1 = id1
-		p2 = id2
-		r1 = rs
-	} else {
-		p1 = id2
-		p2 = id1
-		r2 = rs
-	}
-	relation, err := db.checkRs(p1, p2)
-	if err != nil {
-		return nil, fmt.Errorf("fail to check relationship in database")
-	}
-
 	r := &Relationship{}
-	if len(relation) == 0 {
-		sql := fmt.Sprintf("insert into relationships values(?, ?, ?, ?) returning peer1, peer2, relation1, relation2;")
-		_, err = db.pg.QueryOne(r, sql, p1, p2, r1, r2)
-	} else {
-		if r2 > 0 {
-			sql := fmt.Sprintf("update relationships set relation2=? where peer1=? and peer2=? returning relation1, relation2;")
-			_, err = db.pg.QueryOne(r, sql, r2, p1, p2)
 
-		} else {
-			sql := fmt.Sprintf("update relationships set relation1=? where peer1=? and peer2=? returning relation1, relation2;")
-			_, err = db.pg.QueryOne(r, sql, r1, p1, p2)
-		}
-	}
+	_, err := db.pg.QueryOne(r, "select * from create_rs(?,?,?) as t;", id1, id2, rs)
 	if err != nil {
 		return nil, err
 	}
