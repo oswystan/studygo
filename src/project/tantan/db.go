@@ -143,7 +143,7 @@ func (db *Database) ListUsers() ([]User, error) {
 
 	// TODO we should get page of data
 	var ul []User
-	sql := "select id, name 'user' as type from users;"
+	sql := "select id, name, 'user' as type from users;"
 	_, err := db.pg.Query(&ul, sql)
 	if err != nil {
 		return nil, err
@@ -159,12 +159,15 @@ func (db *Database) GetRelationships(id int64) ([]Relationship, error) {
 	if err != nil {
 		return rs, err
 	}
+	idx := len(rs)
+	postProcessRs(rs, 1)
 
 	sql = fmt.Sprintf("select *, 'relationship' as type from relationships where peer2=%d and relation2 != 0;", id)
 	_, err = db.pg.Query(&rs, sql)
 	if err != nil {
 		return rs, err
 	}
+	postProcessRs(rs[idx:], 2)
 
 	if len(rs) == 0 {
 		return rs, fmt.Errorf("no relationships found")
@@ -212,17 +215,17 @@ func (db *Database) CreateRelationship(id1 int64, id2 int64, state string) (*Rel
 
 	r := &Relationship{}
 	if len(relation) == 0 {
-		sql := fmt.Sprintf("insert into relationships values(%d, %d, %d, %d) returning peer1, peer2, relation1, relation2;",
-			p1, p2, r1, r2)
-		_, err = db.pg.QueryOne(r, sql)
+		sql := fmt.Sprintf("insert into relationships values(?, ?, ?, ?) returning peer1, peer2, relation1, relation2;")
+		_, err = db.pg.QueryOne(r, sql, p1, p2, r1, r2)
 	} else {
-		sql := fmt.Sprintf("update relationships set relation1=%d where peer1=%d and peer2=%d returning relation1, relation2;",
-			r1, p1, p2)
 		if r2 > 0 {
-			sql = fmt.Sprintf("update relationships set relation2=%d where peer1=%d and peer2=%d returning relation1, relation2;",
-				r2, p1, p2)
+			sql := fmt.Sprintf("update relationships set relation2=? where peer1=? and peer2=? returning relation1, relation2;")
+			_, err = db.pg.QueryOne(r, sql, r2, p1, p2)
+
+		} else {
+			sql := fmt.Sprintf("update relationships set relation1=? where peer1=? and peer2=? returning relation1, relation2;")
+			_, err = db.pg.QueryOne(r, sql, r1, p1, p2)
 		}
-		_, err = db.pg.QueryOne(r, sql)
 	}
 	if err != nil {
 		return nil, err
