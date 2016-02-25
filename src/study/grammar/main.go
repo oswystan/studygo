@@ -371,15 +371,20 @@ func reflect_usage() {
 	ty = reflect.TypeOf(p)
 	fmt.Printf("%s\n", ty.Name())
 
-	// BUT when oneType is a pointer of onetype struct
-	// It will not output anything.
-	// TODO WHY?
+	// struct
 	p = oneType
 	ty = reflect.TypeOf(p)
 	fmt.Printf("%s\n", ty.Name())
 
+	// For a Array, Chan, Map, Ptr, or Slice, use the following
+	// method to get the type name.
 	ptr := &onetype{}
 	p = ptr
+	ty = reflect.TypeOf(p).Elem()
+	fmt.Printf("p.element %s\n", ty.Name())
+
+	m := make(map[string]int)
+	p = m
 	ty = reflect.TypeOf(p).Elem()
 	fmt.Printf("p.element %s\n", ty.Name())
 }
@@ -399,7 +404,7 @@ func main() {
 	//closechstruct()
 	//memory()
 	//variouspar()
-	reflect_usage()
+	//reflect_usage()
 }
 
 //==================================== END ======================================
