@@ -13,6 +13,7 @@ package main
 import (
 	"container/list"
 	"fmt"
+	"reflect"
 	"sync"
 	"time"
 	"unsafe"
@@ -334,6 +335,9 @@ func memory() {
 	}
 }
 
+//====================================
+// for various parameters
+//====================================
 func params(s ...string) {
 	for i, v := range s {
 		fmt.Printf("param %d is %s\n", i, v)
@@ -352,6 +356,29 @@ func variouspar() {
 	params(s3...)
 }
 
+func reflect_usage() {
+
+	var p interface{}
+
+	str := "I am a string"
+	i := 4
+	oneType := onetype{}
+
+	p = str
+	ty := reflect.TypeOf(p)
+	fmt.Printf("%s\n", ty.Name())
+	p = i
+	ty = reflect.TypeOf(p)
+	fmt.Printf("%s\n", ty.Name())
+
+	// BUT when oneType is a pointer of onetype struct
+	// It will not output anything.
+	// TODO WHY?
+	p = oneType
+	ty = reflect.TypeOf(p)
+	fmt.Printf("%s\n", ty.Name())
+}
+
 func main() {
 	//breakLoop()
 	//continueLoop()
@@ -367,6 +394,7 @@ func main() {
 	//closechstruct()
 	//memory()
 	//variouspar()
+	reflect_usage()
 }
 
 //==================================== END ======================================
