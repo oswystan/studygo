@@ -334,6 +334,24 @@ func memory() {
 	}
 }
 
+func params(s ...string) {
+	for i, v := range s {
+		fmt.Printf("param %d is %s\n", i, v)
+	}
+}
+func variouspar() {
+	s1 := "i am s1"
+	s2 := "i am s2"
+	var s3 []string
+	s3 = append(s3, "this is s3-1")
+	s3 = append(s3, "this is s3-2")
+	s3 = append(s3, "this is s3-3")
+
+	params(s1)
+	params(s1, s2)
+	params(s3...)
+}
+
 func main() {
 	//breakLoop()
 	//continueLoop()
@@ -348,6 +366,7 @@ func main() {
 	//channel()
 	//closechstruct()
 	//memory()
+	//variouspar()
 }
 
 //==================================== END ======================================
