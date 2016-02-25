@@ -377,6 +377,11 @@ func reflect_usage() {
 	p = oneType
 	ty = reflect.TypeOf(p)
 	fmt.Printf("%s\n", ty.Name())
+
+	ptr := &onetype{}
+	p = ptr
+	ty = reflect.TypeOf(p).Elem()
+	fmt.Printf("p.element %s\n", ty.Name())
 }
 
 func main() {
