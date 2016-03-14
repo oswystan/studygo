@@ -389,6 +389,17 @@ func reflect_usage() {
 	fmt.Printf("p.element %s\n", ty.Name())
 }
 
+func timefmt() {
+	str := "2006-01-02T15:04:05+06:00"
+	tm, e := time.Parse(time.RFC3339, str)
+	if e != nil {
+		fmt.Printf("%s\n", e)
+		return
+	}
+	fmt.Printf("%s\n", tm)
+	fmt.Printf("%s\n", tm.UTC())
+}
+
 func main() {
 	//breakLoop()
 	//continueLoop()
@@ -405,6 +416,7 @@ func main() {
 	//memory()
 	//variouspar()
 	//reflect_usage()
+	//timefmt()
 }
 
 //==================================== END ======================================
