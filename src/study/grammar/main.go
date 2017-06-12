@@ -14,6 +14,7 @@ import (
 	"container/list"
 	"fmt"
 	"reflect"
+	"runtime"
 	"sync"
 	"time"
 	"unsafe"
@@ -398,6 +399,12 @@ func timefmt() {
 	}
 	fmt.Printf("%s\n", tm)
 	fmt.Printf("%s\n", tm.UTC())
+}
+
+func get_file_line_func() {
+	a, b, c, ok := runtime.Caller(0)
+	f := runtime.FuncForPC(a)
+	fmt.Printf("%v, %v, %v, %v, %v\n", a, b, c, ok, f.Name())
 }
 
 func main() {
